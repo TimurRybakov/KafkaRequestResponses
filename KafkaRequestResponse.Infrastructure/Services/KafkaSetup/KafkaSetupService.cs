@@ -1,10 +1,11 @@
-﻿using Confluent.Kafka;
+using Confluent.Kafka;
 using Confluent.Kafka.Admin;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace KafkaRequestResponse.Gateway.Services;
+namespace KafkaRequestResponse.Infrastructure;
 
-internal sealed class KafkaSetupService : IKafkaSetupService, IDisposable
+public sealed class KafkaSetupService : IKafkaSetupService, IDisposable
 {
     private readonly IAdminClient _adminClient;
     private readonly ILogger<KafkaSetupService> _logger;

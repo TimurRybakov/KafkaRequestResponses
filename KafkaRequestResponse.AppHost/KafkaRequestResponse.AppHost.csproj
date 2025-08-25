@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\KafkaRequestResponse.Gateway\KafkaRequestResponse.Gateway.csproj" />
+    <ProjectReference Include="..\KafkaRequestResponse.Processor\KafkaRequestResponse.Processor.csproj" />
   </ItemGroup>
 
 </Project>

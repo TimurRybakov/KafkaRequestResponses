@@ -1,6 +1,6 @@
-﻿using Confluent.Kafka.Admin;
+using Confluent.Kafka.Admin;
 
-namespace KafkaRequestResponse.Gateway;
+namespace KafkaRequestResponse.Infrastructure;
 
 public class KafkaOptions
 {
