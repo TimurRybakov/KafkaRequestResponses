@@ -5,6 +5,7 @@ using KafkaRequestResponse.Processor.Services.KafkaResponseProducer;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
 builder.AddKafkaProducer<Guid, string>(
     "kafka",
     configureBuilder: static configureBuilder =>

@@ -25,10 +25,7 @@ internal sealed class KafkaResponseConsumer : BackgroundService
             {
                 var cr = _consumer.Consume(token);
                 if (cr?.Message == null) continue;
-                //if (Guid.TryParse(cr.Message.Key, out var id))
-                {
-                    _router.Complete(cr.Message.Key, cr.Message.Value);
-                }
+                _router.Complete(cr.Message.Key, cr.Message.Value);
             }
         }
         catch (OperationCanceledException) { }

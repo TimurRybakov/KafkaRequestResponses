@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Confluent.Kafka;
 using KafkaRequestResponse.Gateway.Services.KafkaRequestProducer;
 using KafkaRequestResponse.Gateway.Services.KafkaResponseConsumer;
@@ -62,17 +63,27 @@ app.MapGet(
         string message,
         IKafkaRequestProducer producer,
         IKafkaResponseRouter router,
+        ActivitySource activitySource,
         CancellationToken cancellationToken) =>
     {
-        var corellationId = Guid.NewGuid();
+        Guid corellationId = Guid.NewGuid();
+        Task<string> resultWaitingTask;
+        using (var outer = activitySource.StartActivity("Registering waiter"))
+        {
+            resultWaitingTask = router.RegisterWaiter(corellationId, TimeSpan.FromSeconds(10));
+        }
+        using (var outer = activitySource.StartActivity("Posting request"))
+        {
+            await producer.ProduceRequestAsync(corellationId, message);
+        }
 
-        var waitTask = router.RegisterWaiter(corellationId, TimeSpan.FromSeconds(10));
-        await producer.ProduceRequestAsync(corellationId, message);
-
-        using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        var completed = await Task.WhenAny(waitTask, Task.Delay(Timeout.Infinite, linked.Token));
-        if (completed == waitTask)
-            return Results.Ok(waitTask.Result);
+        using (var outer = activitySource.StartActivity("Waiting response"))
+        {
+            using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            var completed = await Task.WhenAny(resultWaitingTask, Task.Delay(Timeout.Infinite, linked.Token));
+            if (completed == resultWaitingTask)
+                return Results.Ok(resultWaitingTask.Result);
+        }
 
         return Results.StatusCode(504); // таймаут
     })
