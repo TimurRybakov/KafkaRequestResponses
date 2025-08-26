@@ -11,3 +11,4 @@ A request-response pattern between two applications with Kafka for testing synch
                                          |              | Processor2 |
                                          |<-------------|------------|
 ```
+Distributed application built with .NET Aspire SDK + Confluent.Kafka library. Topic creation is self-managed by services.
