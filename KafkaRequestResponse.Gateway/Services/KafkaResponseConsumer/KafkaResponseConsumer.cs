@@ -6,11 +6,11 @@ namespace KafkaRequestResponse.Gateway.Services.KafkaResponseConsumer;
 internal sealed class KafkaResponseConsumer : BackgroundService
 {
     private readonly ILogger<KafkaResponseConsumer> _logger;
-    private readonly IConsumer<string, string> _consumer;
+    private readonly IConsumer<Guid, string> _consumer;
 
     private readonly IKafkaResponseRouter _router;
 
-    public KafkaResponseConsumer(ILogger<KafkaResponseConsumer> logger, IConsumer<string, string> consumer, IKafkaResponseRouter router)
+    public KafkaResponseConsumer(ILogger<KafkaResponseConsumer> logger, IConsumer<Guid, string> consumer, IKafkaResponseRouter router)
     {
         _logger = logger;
         _consumer = consumer;
@@ -25,9 +25,9 @@ internal sealed class KafkaResponseConsumer : BackgroundService
             {
                 var cr = _consumer.Consume(token);
                 if (cr?.Message == null) continue;
-                if (Guid.TryParse(cr.Message.Key, out var id))
+                //if (Guid.TryParse(cr.Message.Key, out var id))
                 {
-                    _router.Complete(id, cr.Message.Value);
+                    _router.Complete(cr.Message.Key, cr.Message.Value);
                 }
             }
         }

@@ -5,12 +5,23 @@ using KafkaRequestResponse.Processor.Services.KafkaResponseProducer;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddKafkaProducer<string, string>("kafka");
-builder.AddKafkaConsumer<string, string>("kafka", settings =>
-{
-    settings.Config.GroupId = "gateway";
-    settings.Config.AutoOffsetReset = AutoOffsetReset.Earliest;
-});
+builder.AddKafkaProducer<Guid, string>(
+    "kafka",
+    configureBuilder: static configureBuilder =>
+    {
+        configureBuilder.SetKeySerializer(new KeySerializer());
+    });
+builder.AddKafkaConsumer<Guid, string>(
+    "kafka",
+    static configureSettings =>
+    {
+        configureSettings.Config.GroupId = "gateway";
+        configureSettings.Config.AutoOffsetReset = AutoOffsetReset.Earliest;
+    },
+    static configureBuilder =>
+    {
+        configureBuilder.SetKeyDeserializer(new KeyDeserializer());
+    });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

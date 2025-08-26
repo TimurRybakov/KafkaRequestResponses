@@ -6,10 +6,10 @@ namespace KafkaRequestResponse.Processor.Services.KafkaRequestConsumer;
 internal sealed class KafkaRequestConsumer : BackgroundService
 {
     private readonly ILogger<KafkaRequestConsumer> _logger;
-    private readonly IConsumer<string, string> _consumer;
+    private readonly IConsumer<Guid, string> _consumer;
     private readonly IKafkaResponseProducer _producer;
 
-    public KafkaRequestConsumer(ILogger<KafkaRequestConsumer> logger, IConsumer<string, string> consumer, IKafkaResponseProducer producer)
+    public KafkaRequestConsumer(ILogger<KafkaRequestConsumer> logger, IConsumer<Guid, string> consumer, IKafkaResponseProducer producer)
     {
         _logger = logger;
         _consumer = consumer;
@@ -32,6 +32,10 @@ internal sealed class KafkaRequestConsumer : BackgroundService
         catch (Exception e)
         {
             _logger.LogError("Exception consuming request: {Message}", e.Message);
+        }
+        finally
+        {
+            _consumer.Close();
         }
     }
 
